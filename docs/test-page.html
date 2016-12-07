@@ -1,0 +1,69 @@
+<html>
+<head>
+    <title>Game Engine Test Page</title>
+    <link href="https://fonts.googleapis.com/css?family=Artifika" rel="stylesheet">
+    <style>
+    body {
+        background: #000000;
+        color: #ffffff;
+    }
+    canvas {
+        padding: 0;
+        margin: auto;
+        display: block;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border: 1px solid #fff;
+    }
+    .panel {
+        padding: 0;
+        margin: auto;
+        display: block;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border: 1px solid #fff;
+        overflow: auto;
+        font-family: 'Artifika', serif;
+        color: #000000;
+        visibility: hidden;
+        background-image: url("img/parchment.png");
+        background-repeat: repeat;
+    }
+    </style>
+</head>
+<body>
+    <h1><img src="img/perry.png">This page tests Perry.</h1>
+    <canvas id="perry-display">
+        Your browser does not appear to support the
+        <code>&lt;canvas&gt;</code> element.
+    </canvas>
+    <div id="desc" class="panel" style="width: 50%; height: 50%" hidden>
+            <p>
+                The most merciful thing in the world, I think, is the inability of the human mind to correlate all its contents. We live on a placid island of ignorance in the midst of black seas of infinity, and it was not meant that we should voyage far. The sciences, each straining in its own direction, have hitherto harmed us little; but some day the piecing together of dissociated knowledge will open up such terrifying vistas of reality, and of our frightful position therein, that we shall either go mad from the revelation or flee from the deadly light into the peace and safety of a new dark age.
+            </p>
+            <p>
+                Theosophists have guessed at the awesome grandeur of the cosmic cycle wherein our world and human race form transient incidents. They have hinted at strange survivals in terms which would freeze the blood if not masked by a bland optimism. But it is not from them that there came the single glimpse of forbidden aeons which chills me when I think of it and maddens me when I dream of it. That glimpse, like all dread glimpses of truth, flashed out from an accidental piecing together of separated things—in this case an old newspaper item and the notes of a dead professor. I hope that no one else will accomplish this piecing out; certainly, if I live, I shall never knowingly supply a link in so hideous a chain. I think that the professor, too, intended to keep silent regarding the part he knew, and that he would have destroyed his notes had not sudden death seized him.
+            </p>
+            <p>
+                My knowledge of the thing began in the winter of 1926–27 with the death of my grand-uncle George Gammell Angell, Professor Emeritus of Semitic Languages in Brown University, Providence, Rhode Island. Professor Angell was widely known as an authority on ancient inscriptions, and had frequently been resorted to by the heads of prominent museums; so that his passing at the age of ninety-two may be recalled by many. Locally, interest was intensified by the obscurity of the cause of death. The professor had been stricken whilst returning from the Newport boat; falling suddenly, as witnesses said, after having been jostled by a nautical-looking negro who had come from one of the queer dark courts on the precipitous hillside which formed a short cut from the waterfront to the deceased’s home in Williams Street. Physicians were unable to find any visible disorder, but concluded after perplexed debate that some obscure lesion of the heart, induced by the brisk ascent of so steep a hill by so elderly a man, was responsible for the end. At the time I saw no reason to dissent from this dictum, but latterly I am inclined to wonder—and more than wonder.
+            </p>
+        </div>
+    <!-- Load the scripts here. -->
+    <script src="js/Perry.js"></script>
+    <script src="js/EventEngine.js"></script>
+    <script src="js/Entity.js"></script>
+    <script src="js/Body.js"></script>
+    <script src="js/Agent.js"></script>
+    <script src="js/Scene.js"></script>
+    <script src="js/ImageCache.js"></script>
+    <script src="js/WebDisplay.js"></script>
+
+    <script src="test-page.js"></script>
+</body>
+</html>
