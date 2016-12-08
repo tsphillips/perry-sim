@@ -22,6 +22,11 @@ if (typeof Perry === "undefined") {
             this.Server = {};
         } // constructor()
 
+        // Random things
+        random() {
+            return Math.random();
+        } // random()
+
         // UI Helpers
         showElement(id) {
             var e = document.getElementById(id);
@@ -215,6 +220,14 @@ Perry.Server.Entity = class {
         } // if
         else {
             this.lastUpdate = Date.now();
+            // uuid snippet from:
+            // http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript#2117523
+            this.uuid =
+            'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+                function(c) {
+                    var r = Perry.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                    return v.toString(16);
+                });
             this.attr = {};
         } // else
     } // constructor()
@@ -315,6 +328,9 @@ Perry.Server.Body = class extends Perry.Server.Entity {
         this.position.i += this.velocity.di * delta;
         this.position.j += this.velocity.dj * delta;
         this.lastUpdate = t;
+        this.position.z =
+            Math.floor(this.position.i) +
+            Math.floor(this.position.j);
         return this.position;
     } // move()
 
@@ -331,9 +347,13 @@ Perry.Server.Body = class extends Perry.Server.Entity {
         var delta = ((t - this.lastUpdate) / 1000);
         var di = this.velocity.di * delta;
         var dj = this.velocity.dj * delta;
-        var dTraveled = Math.sqrt(di * di + dj * dj);
-        var dToTarget = this.distance(this.target, this.position);
-        if (dToTarget <= dTraveled) {
+        // var dTraveled = Math.sqrt(di * di + dj * dj);
+        // var dToTarget = this.distance(this.target, this.position);
+        var d1 = (di * di) + (dj * dj);
+        var dtpi = (this.target.i - this.position.i);
+        var dtpj = (this.target.j - this.position.j);
+        var d2 = (dtpi * dtpi) + (dtpj * dtpj);
+        if (d2 <= d1) {
             // snip the vector and stop motion
             this.position.i = this.target.i;
             this.position.j = this.target.j;
@@ -342,8 +362,11 @@ Perry.Server.Body = class extends Perry.Server.Entity {
         else {
             this.position.i += di;
             this.position.j += dj;
-            this.lastUpdate = t;
+            this.lastUpdate = Date.now();
         } // else
+        this.position.z =
+            Math.floor(this.position.i) +
+            Math.floor(this.position.j);
         return this.position;
     } // moveTo()
 
@@ -442,7 +465,7 @@ Perry.Server.Scene = class {
     fill() {
         for (var i = 0; i < this.height;  i++) {
             for (var j = 0; j < this.width ; j++) {
-                this.tiles[(i*this.width)+j] = Math.floor(Math.random() * 5);
+                this.tiles[(i*this.width)+j] = Math.floor(Perry.random() * 5);
             } // for j
         } // for i
         this.tiles[0] = 1;

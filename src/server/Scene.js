@@ -36,7 +36,7 @@ Perry.Server.Scene = class {
     fill() {
         for (var i = 0; i < this.height;  i++) {
             for (var j = 0; j < this.width ; j++) {
-                this.tiles[(i*this.width)+j] = Math.floor(Math.random() * 5);
+                this.tiles[(i*this.width)+j] = Math.floor(Perry.random() * 5);
             } // for j
         } // for i
         this.tiles[0] = 1;

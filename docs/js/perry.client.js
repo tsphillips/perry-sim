@@ -22,6 +22,11 @@ if (typeof Perry === "undefined") {
             this.Server = {};
         } // constructor()
 
+        // Random things
+        random() {
+            return Math.random();
+        } // random()
+
         // UI Helpers
         showElement(id) {
             var e = document.getElementById(id);
@@ -228,8 +233,8 @@ Perry.Client.WebDisplay = class {
         this.tileWidth = 64;
         this.tileHeight = 32;
         // camera and mouse
-        this.offsetX = this.width * Math.random();
-        this.offsetY = this.height * Math.random();
+        this.offsetX = this.width * Perry.random();
+        this.offsetY = this.height * Perry.random();
         this.mouseX = 0;
         this.mouseY = 0;
         this.tileI = 0;
@@ -238,8 +243,8 @@ Perry.Client.WebDisplay = class {
         this.scene = null;
         this.imageCache = null;
         // debug
-        this.dX = 0.5 + Math.random() * 2;
-        this.dY = 0.5 + Math.random() * 2;
+        this.dX = 0.5 + Perry.random() * 2;
+        this.dY = 0.5 + Perry.random() * 2;
         Perry.display = this;
     } // constructor
 
@@ -280,20 +285,44 @@ Perry.Client.WebDisplay = class {
     drawScene(scene) {
         // 5 is 1/2 height
         // 10 is 1/2 width
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.save();
-        this.iLo = Math.floor(Math.max(0,
-            this.camera.position.i - (this.width / this.scene.tileWidth) - 10));
-        this.iHi = Math.floor(Math.min(this.scene.width,
-            this.camera.position.i + (this.width / this.scene.tileWidth) + 10));
-        this.jLo = Math.floor(Math.max(0,
-            this.camera.position.j - (this.width / this.scene.tileWidth) - 10));
-        this.jHi = Math.floor(Math.min(this.scene.width,
-            this.camera.position.j + (this.width / this.scene.tileWidth) + 10));
-        this.zLo = this.iLo + this.jLo;
-        this.zHi = this.iHi + this.jHi;
-        for (var i = this.iLo; i < this.iHi; i++) {
-            for (var j = this.jLo; j < this.jHi; j++) {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // this.iLo = Math.floor(Math.max(0,
+        //     this.camera.position.i - (this.width / this.scene.tileWidth) - 10));
+        // this.iHi = Math.floor(Math.min(this.scene.width,
+        //     this.camera.position.i + (this.width / this.scene.tileWidth) + 10));
+        // this.jLo = Math.floor(Math.max(0,
+        //     this.camera.position.j - (this.width / this.scene.tileWidth) - 10));
+        // this.jHi = Math.floor(Math.min(this.scene.width,
+        //     this.camera.position.j + (this.width / this.scene.tileWidth) + 10));
+
+        this.zLo = Math.max(0,
+                (this.camera.position.i + this.camera.position.j) -
+                (this.height / this.scene.tileHeight) - 2
+        );
+        this.zHi = Math.min(this.scene.width + this.scene.height,
+                (this.camera.position.i + this.camera.position.j) +
+                (this.height / this.scene.tileHeight) + 4
+        );
+        this.tdrawCnt = 0;
+        this.tileCnt = 0;
+        for (var z = this.zLo; z < this.zHi; z++) {
+            this.dz = z - (this.camera.position.i + this.camera.position.j);
+            this.qLo = - Math.floor(this.width / this.scene.tileWidth) - 3;
+            this.qHi = Math.floor(this.width / this.scene.tileWidth) + 3;
+            for (var q=this.qLo; q < this.qHi; q++) {
+                this.tileCnt++;
+                var i = Math.floor(this.camera.position.i + this.dz + q);
+                var j = Math.floor(z - i);
+                if ((i < 0) ||
+                    (i >= this.scene.width) ||
+                    (j < 0) ||
+                    (j >= this.scene.height)) {
+                    continue;
+                } // if out of bounds
+        // for (var i = this.iLo; i < this.iHi; i++) {
+        //     for (var j = this.jLo; j < this.jHi; j++) {
                 var x;
                 var y;
                 x = (this.scene.tileWidth / 2) * (i - j);
@@ -305,6 +334,7 @@ Perry.Client.WebDisplay = class {
                 var img = this.imageCache.cache["img/iso-64x64-outside.png"];
                 var tile = scene.tiles[(i * scene.width) + j];
                 if (tile) {
+                    this.tdrawCnt++;
                     this.ctx.beginPath();
                     this.ctx.moveTo(x, y);
                     this.ctx.lineTo(x-(this.scene.tileWidth/2),
@@ -387,8 +417,8 @@ Perry.Client.WebDisplay = class {
         // this.offsetX = this.width / 2 - pos.x;
         // this.offsetY = this.height / 2 - pos.y;
         // console.log(this.offsetY - (this.height / 2 - pos.y));
-        this.offsetX = (this.offsetX * 9 + (this.width / 2 - pos.x)) / 10;
-        this.offsetY = (this.offsetY * 9 + (this.height / 2 - pos.y)) / 10;
+        this.offsetX = (this.width / 2 - pos.x);
+        this.offsetY = (this.height / 2 - pos.y);
 
         // Draw the scene
         if (this.scene) {
@@ -422,12 +452,15 @@ Perry.Client.WebDisplay = class {
             msg = "i: " + Math.floor(this.tileI) + " j: " + Math.floor(this.tileJ);
             this.ctx.fillText(msg, 10, 42);
             // draw bounds
-            msg = "iLo: " + this.iLo + " iHi: " + this.iHi;
-            this.ctx.fillText(msg, 200, 14);
-            msg = "jLo: " + this.jLo + " jHi: " + this.jHi;
-            this.ctx.fillText(msg, 200, 28);
+            // msg = "iLo: " + this.iLo + " iHi: " + this.iHi;
+            // this.ctx.fillText(msg, 200, 14);
+            // msg = "jLo: " + this.jLo + " jHi: " + this.jHi;
+            // this.ctx.fillText(msg, 200, 28);
             msg = "zLo: " + this.zLo + " zHi: " + this.zHi;
-            this.ctx.fillText(msg, 200, 42);
+            this.ctx.fillText(msg, 200, 14);
+            // draw tile stats
+            msg = "tiles: " + this.tileCnt + " tdraws: " + this.tdrawCnt;
+            this.ctx.fillText(msg, 200, 28);
             this.ctx.restore();
         } // if
         this.tickCount++;

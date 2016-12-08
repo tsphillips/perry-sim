@@ -28,14 +28,14 @@ function timingTest() {
     var p;
     t1 = Date.now();
     for (var i=0; i<10000000; i++) {
-        p = {i: Math.random(), j: Math.random()};
+        p = {i: Perry.random(), j: Perry.random()};
     } // for i
     t2 = Date.now();
     console.log("New {}: " + (t2 - t1) + "ms");
 
     for (var i=0; i<10000000; i++) {
-        p.i = Math.random();
-        p.j = Math.random();
+        p.i = Perry.random();
+        p.j = Perry.random();
     } // for i
     t2 = Date.now();
     console.log("New {}: " + (t2 - t1) + "ms");
@@ -55,10 +55,10 @@ function loadAssets(callback) {
 } // loadAssets()
 
 function startTest() {
-    var people = 6;
+    var people = 2;
     scene = new Perry.Server.Scene();
-    scene.width = 256;
-    scene.height = 256;
+    scene.width = 4;
+    scene.height = 6;
     scene.fill();
 
     wd = new Perry.Client.WebDisplay();
@@ -90,14 +90,18 @@ function debugUpdate() {
 }
 
 function rnd(n) {
-    return Math.floor(Math.random() * n);
+    return Math.floor(Perry.random() * n);
 } // rnd()
 
-function debugAgentTarget() {
+function debugAgentTarget(speed) {
     for (var k=0; k<agents.length; k++) {
+        var v = 2 + rnd(6);
+        if (typeof speed !== 'undefined') {
+            v = speed;
+        } // if
         agents[k].setTarget(
             {i: rnd(scene.width), j: rnd(scene.height)},
-            20+rnd(6));
+            v);
     } // for k
 } // debugAgentTarget()
 

@@ -22,6 +22,11 @@ if (typeof Perry === "undefined") {
             this.Server = {};
         } // constructor()
 
+        // Random things
+        random() {
+            return Math.random();
+        } // random()
+
         // UI Helpers
         showElement(id) {
             var e = document.getElementById(id);
