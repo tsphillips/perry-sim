@@ -21,6 +21,7 @@ var wd_loop;
 var agent;
 var a1;
 var a2;
+var scene;
 
 function timingTest() {
     var t1, t2;
@@ -41,49 +42,64 @@ function timingTest() {
 } // timingTest()
 
 function loadAssets(callback) {
-    ic = new Perry.ImageCache();
+    ic = new Perry.Client.ImageCache();
     ic.debug = true;
     ic.onReady = callback;
     var images = [
         "img/perry.png",
         "img/dude.png",
-        "img/perry-01.png",
-        "https://ifcomp.org/static/images/covers/noqmuesoxx4vb6qy"
+        "img/perry-02.png",
+        "img/iso-64x64-outside.png"
     ];
     ic.loadImage(images, function(){console.log("image loaded");});
 } // loadAssets()
 
 function startTest() {
-    var scene = new Perry.Scene();
-    scene.width = 8000;
-    scene.height = 8000;
+    var people = 6;
+    scene = new Perry.Server.Scene();
+    scene.width = 256;
+    scene.height = 256;
     scene.fill();
 
-    wd = new Perry.WebDisplay();
+    wd = new Perry.Client.WebDisplay();
+    wd.imageCache = ic;
     wd.scene = scene;
 
     wd_loop = setInterval(wd.tick.bind(wd), 16);
 
     wd.ctx.drawImage(ic.cache["img/perry.png"], 100, 100);
-    wd.ctx.drawImage(ic.cache["https://ifcomp.org/static/images/covers/noqmuesoxx4vb6qy"], 400, 400);
 
-    agent = new Perry.Agent();
-    wd.camera = agent;
-    agent.img = ic.cache["img/dude.png"];
-    agent.x = 5;
-    agent.y = 5;
+    agents = [];
+    for (var k=0; k<people; k++) {
+        agents[k] = new Perry.Server.Agent();
+        agents[k].img = ic.cache["img/dude.png"];
+    } // for k
+    wd.camera = agents[0];
+    scene.agents = agents;
 
-    a1 = new Perry.Agent();
-    a1.img = ic.cache["img/dude.png"];
-
-    scene.agents.push(agent);
-    scene.agents.push(a1);
-
-    agent.setTarget({i:10, j:3}, 0.2);
-    console.log(agent);
     wd.freezeTest();
     wd.debug = true;
+
+    updateHandle = setInterval(debugUpdate, 1 / 30);
 } // startTest()
+
+function debugUpdate() {
+    for (var i=0; i<agents.length; i++) {
+        agents[i].update(this);
+    } // if
+}
+
+function rnd(n) {
+    return Math.floor(Math.random() * n);
+} // rnd()
+
+function debugAgentTarget() {
+    for (var k=0; k<agents.length; k++) {
+        agents[k].setTarget(
+            {i: rnd(scene.width), j: rnd(scene.height)},
+            20+rnd(6));
+    } // for k
+} // debugAgentTarget()
 
 window.onload = function() {
     timingTest();

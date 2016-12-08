@@ -15,12 +15,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var Perry = Perry || {};
+Perry;
 
 /**
 * Something that has a location in the world.
 */
-Perry.Body = class extends Perry.Entity {
+Perry.Server.Body = class extends Perry.Server.Entity {
     constructor(json) {
         if (typeof json === "string") {
             super(json);
@@ -92,6 +92,11 @@ Perry.Body = class extends Perry.Entity {
     * Move toward target and stop when it arrives.
     */
     moveTo() {
+        if (this.velocity.di === 0 &&
+            this.velocity.dj === 0) {
+            return;
+        } // if
+
         var t = Date.now();
         var delta = ((t - this.lastUpdate) / 1000);
         var di = this.velocity.di * delta;

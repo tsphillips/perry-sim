@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var Perry = Perry || {};
+Perry;
 
 /**
 * An ImageCache object will load images in the background and invoke
@@ -23,7 +23,7 @@ var Perry = Perry || {};
 *
 * Set the onReady field to a callback function that will be invoked once all images are ready.
 */
-Perry.ImageCache = class {
+Perry.Client.ImageCache = class {
     constructor() {
         this.cache     = {};    // images are stored here
         this.callbacks = {};    // a callback for each image

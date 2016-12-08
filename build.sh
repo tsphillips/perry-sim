@@ -14,3 +14,24 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+DATE=`date +%Y%m%d%H%M%S`
+
+SERVER_FILES="\
+    src/Perry.js \
+    src/server/EventEngine.js \
+    src/server/Entity.js \
+    src/server/Body.js \
+    src/server/Agent.js \
+    src/server/Scene.js"
+
+CLIENT_FILES="\
+    src/Perry.js \
+    src/client/ImageCache.js \
+    src/client/TileSet.js \
+    src/client/WebDisplay.js"
+
+
+echo ${SERVER_FILES} | xargs cat > build/perry.server.js
+echo ${CLIENT_FILES} | xargs cat > build/perry.client.js
+cp build/*.js docs/js

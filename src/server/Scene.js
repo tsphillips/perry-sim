@@ -15,9 +15,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var Perry = Perry || {};
+Perry;
 
-Perry.Scene = class {
+Perry.Server.Scene = class {
     constructor() {
         this.name = "Empty Scene";
         this.width = 32; // default

@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var Perry = Perry || {};
+Perry;
 
 /**
 * An engine that queues functions for invocation.
@@ -24,7 +24,7 @@ var Perry = Perry || {};
 * For example,
 * engine.queueFunction(Date.now() + 1000, obj.func.bind(obj)
 */
-Perry.FunctionEngine = class {
+Perry.Server.FunctionEngine = class {
 
     constructor() {
         this.debug = false;

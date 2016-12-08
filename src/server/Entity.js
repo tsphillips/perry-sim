@@ -15,12 +15,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var Perry = Perry || {};
+Perry;
 
 /**
 * Something that exists.
 */
-Perry.Entity = class {
+Perry.Server.Entity = class {
     constructor(json) {
         if (typeof json === "string") {
             Object.assign(this, JSON.parse(json));

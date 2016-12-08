@@ -15,12 +15,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var Perry = Perry || {};
+Perry;
 
 /**
 * Something that can interact with a scene.
 */
-Perry.Agent = class extends Perry.Body {
+Perry.Server.Agent = class extends Perry.Server.Body {
     constructor(json) {
         if (typeof json === "string") {
             super(json);
@@ -32,14 +32,6 @@ Perry.Agent = class extends Perry.Body {
             this.img = null;
         } // else
     } // constructor()
-
-    render(display) {
-        if (typeof this.img === "object") {
-            display.ctx.drawImage(this.img,
-                this.position.i * 100,
-                this.position.j * 100);
-        } // if
-    } // render()
 
     update(display) {
         // this.render(display);
