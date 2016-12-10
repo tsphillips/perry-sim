@@ -1,0 +1,14 @@
+# TODO
+
+## Near-term
+
+* Add button class that binds to arbitrary functions.
+* Add blocking tiles. Probably something like even numbers are pass-through and odd numbers are blocking.
+* Add target queue on Body. moveTo() will grab the next target in the queue after arriving at a target.
+* Add pathfinding to moveTo().
+* Add Zone class that references multiple Scene instances.
+* Add portal locations to scenes, where a portal links to a zone:scene:position.
+
+## Long-term
+
+* Add EntityProxy class that is used by the Client classes. EntityProxy instances will sync with server.
