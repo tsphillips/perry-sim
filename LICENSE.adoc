@@ -1,16 +1,16 @@
 # License Information for Perry Sim Software
 
-## Special Cases
-
-These files are special cases for licesning:
-
-- File: iso-64x64-outside.png
-- Author: Yar
-- Link: http://opengameart.org/content/isometric-64x64-outside-tileset
-
 ## Copyright and Licensing
 
 Copyright (c)2016 Thomas S. Phillips.
 
 The original works in this repository fall under either the GPL3 free software license or the the Creative Commons Attribution-ShareAlike 4.0 International License.
-Any file not bearing a mark referring to an applicable license is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.
+Any file not bearing a mark referring to an applicable license and is not specifically referenced in this document, is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.
+
+## Credits
+
+* File: iso-64x64-outside.png
+* Author: Yar
+* Link: http://opengameart.org/content/isometric-64x64-outside-tileset
+
+If I have included something you created, but forgot to mention you, please let me know and I will add attribution.
