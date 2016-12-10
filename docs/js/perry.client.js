@@ -298,7 +298,6 @@ Perry.Client.WebDisplay = class {
     * Respond to a touch event on the display.
     */
     doTouch(evt) {
-        console.log(evt);
         var rect = this.canvas.getBoundingClientRect();
         this.mouseX = evt.clientX - rect.left;
         this.mouseY = evt.clientY - rect.top;
