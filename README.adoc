@@ -1,0 +1,51 @@
+= README
+Thomas S. Phillips <tom@tsphillips.net>
+:toc:
+:toclevels: 2
+:numbered:
+
+== Perry Sim Manifesto
+
+=== Create a virtual world simulator focusing on semantics.
+
+Simulate the relationships amongst entities, agents, and the world.
+The world consists of rules, entities are dynamic, and agents are entities with agency.
+Agents may be autonomous or controlled by real people.
+
+=== Separate the server and clients.
+
+The server hosts a model of the world, while a client is merely a view into that model.
+Different clients can then provide different views into the same model.
+Some clients may be simple and straightforward, while others may be elaborate physics simulations.
+
+=== No external dependencies.
+
+Why? Because other libraries are perpetual moving targets.
+I do not want to constantly chase changes in other libraries.
+I think the eternal evolution of dependencies is a bad habit the Internet needs to kick.
+
+== Q&A
+
+[qanda]
+Why the name "Perry Sim?"::
+    In 1985, Infocom released a text adventure game titled _A Mind Forever Voyaging_, which was written by Steve Meretzky.
+    In the game there was a sentient computer called PRISM that was used to simulate society.
+    PRISM had a persona named Perry Sim.
+    Thus, the project name is an homage to Steve Meretzy and _A Mind Forever Voyaging_.
+
+What is the project logo?::
+    The project logo is a platypus named Perry, paying homage to Perry the Platypus (AKA "Agent P"), who was a semi-aquatic egg-laying mammal of action.
+
+Why is the project in Javascript?::
+    Perry Sim is meant to be a self-contained platform that can run as easily as possible on as many platforms as possible.
+    Because of the ubiquity of web browsers and Javascript, the language choice seemed to make sense.
+
+What is Perry Sim best suited for?::
+    Perry Sim is best suited for interactive fiction and role-playing games.
+    The project is not meant to be a general purpose game framework.
+
+Does the platform support multi-player games?::
+    Yes, that is a long-term goal. For now, the main focus is on self-contained packages, to include games, simulations, educational works, and interactive fiction.
+
+Who made Perry Sim?::
+    Thomas S. Phillips is the author and maintainer of Perry Sim. He likes exhaustingly long walks, cats and other predators, guns and ammo, explosives and other dangerous things, mathematics, linguistics, music, and tacos.

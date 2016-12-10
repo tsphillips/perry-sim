@@ -55,10 +55,10 @@ function loadAssets(callback) {
 } // loadAssets()
 
 function startTest() {
-    var people = 2;
+    var people = 4;
     scene = new Perry.Server.Scene();
-    scene.width = 4;
-    scene.height = 6;
+    scene.width = 32;
+    scene.height = 32;
     scene.fill();
 
     wd = new Perry.Client.WebDisplay();

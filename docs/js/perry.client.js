@@ -26,6 +26,9 @@ if (typeof Perry === "undefined") {
         random() {
             return Math.random();
         } // random()
+        clamp(val, min, max) {
+            return Math.max(min, Math.min(max, val));
+        } // clamp()
 
         // UI Helpers
         showElement(id) {
@@ -210,6 +213,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Perry;
 
+
+/**
+* Today, WebDisplay.
+* Tomorrow, Display, extended by CanvasDisplay and WebGlDisplay.
+* The biggest issue right now is tight coupling between client and server.
+* This class should have no direct knowledge of Perry.Server.Scene or
+* Perry.Server.Agent.
+*/
 Perry.Client.WebDisplay = class {
     constructor() {
         var canvas;
@@ -222,7 +233,9 @@ Perry.Client.WebDisplay = class {
         canvas.height = document.documentElement.clientHeight * 0.95;
         this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d");
-        canvas.addEventListener('mousemove', this.mouseMove.bind(this), false);
+        // All events will be "touch" driven.
+        canvas.addEventListener("touchstart", this.doTouch.bind(this), false);
+        canvas.addEventListener("mousedown", this.doTouch.bind(this), false);
         // timing
         this.startTime = Date.now();
         this.lastUpdate = Date.now();
@@ -266,45 +279,52 @@ Perry.Client.WebDisplay = class {
         };
     } // xy2ij()
 
+    /**
+    * DEPRECATED
+    * We do not want a mouse move handler.
+    * Events should all be "touch" driven."
+    */
     mouseMove(evt) {
         var rect = this.canvas.getBoundingClientRect();
         this.mouseX = evt.clientX - rect.left;
         this.mouseY = evt.clientY - rect.top;
-        // x = (tileWidth / 2) * (i - j)
-        // y = (tileHeight / 2) * (i + j)
         var xw = ((this.mouseX - this.offsetX) / (this.scene.tileWidth / 2));
         var yh = ((this.mouseY - this.offsetY) / (this.scene.tileHeight / 2));
         this.tileI = 1 + xw + ((yh - xw) / 2);
         this.tileJ = 1 + (yh - xw) / 2;
-        // x = w * (i-j) ; x/w = i-j ; i = (x/w)+j
-        // y = h * (i+j) ; y/h = i+j ; i = (y/h)-j
-        // (x/w)+j = (y/h)-j ; 2*j = (y/h) - (x/w) ; j = ((y/h) - (x/w)) / 2
-        // i = (x/w) + (((y/h) - (x/w)) / 2)
     } // mouseMove()
 
+    /**
+    * Respond to a touch event on the display.
+    */
+    doTouch(evt) {
+        console.log(evt);
+        var rect = this.canvas.getBoundingClientRect();
+        this.mouseX = evt.clientX - rect.left;
+        this.mouseY = evt.clientY - rect.top;
+        var xw = ((this.mouseX - this.offsetX) / (this.scene.tileWidth / 2));
+        var yh = ((this.mouseY - this.offsetY) / (this.scene.tileHeight / 2));
+        this.tileI = Math.floor(1 + xw + ((yh - xw) / 2));
+        this.tileI = Perry.clamp(this.tileI, 0, this.scene.width - 1);
+        this.tileJ = Math.floor(1 + (yh - xw) / 2);
+        this.tileJ = Perry.clamp(this.tileJ, 0, this.scene.height - 1);
+        // TODO: SUPERHACK! FIXME
+        // reaching into mysterious global variable for prototype and test
+        agents[0].setTarget({i: this.tileI, j: this.tileJ}, 10);
+    } // doTouch()
+
     drawScene(scene) {
-        // 5 is 1/2 height
-        // 10 is 1/2 width
         this.ctx.save();
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // this.iLo = Math.floor(Math.max(0,
-        //     this.camera.position.i - (this.width / this.scene.tileWidth) - 10));
-        // this.iHi = Math.floor(Math.min(this.scene.width,
-        //     this.camera.position.i + (this.width / this.scene.tileWidth) + 10));
-        // this.jLo = Math.floor(Math.max(0,
-        //     this.camera.position.j - (this.width / this.scene.tileWidth) - 10));
-        // this.jHi = Math.floor(Math.min(this.scene.width,
-        //     this.camera.position.j + (this.width / this.scene.tileWidth) + 10));
-
-        this.zLo = Math.max(0,
+        this.zLo = Math.floor(Math.max(0,
                 (this.camera.position.i + this.camera.position.j) -
                 (this.height / this.scene.tileHeight) - 2
-        );
-        this.zHi = Math.min(this.scene.width + this.scene.height,
+        ));
+        this.zHi = Math.floor(Math.min(this.scene.width + this.scene.height,
                 (this.camera.position.i + this.camera.position.j) +
                 (this.height / this.scene.tileHeight) + 4
-        );
+        ));
         this.tdrawCnt = 0;
         this.tileCnt = 0;
         for (var z = this.zLo; z < this.zHi; z++) {
@@ -389,15 +409,27 @@ Perry.Client.WebDisplay = class {
                 else {
                     this.ctx.drawImage(
                         img,
-                        4*64, 3*64,
+                        4*64, 8*64,
                         64, 64,
                         x-(this.scene.tileWidth/2), y-64,
                         64, 64
                     );
                 } // if tile
 
-            } // for j
-        } // for i
+            } // for q
+            // Draw the agents in the scene
+            if (this.agentZBuffer[z]) {
+                for (var a=0; a<this.agentZBuffer[z].length; a++) {
+                    var pos = this.ij2xy(
+                        this.agentZBuffer[z][a].position.i,
+                        this.agentZBuffer[z][a].position.j);
+                    this.ctx.drawImage(
+                        this.agentZBuffer[z][a].img,
+                        pos.x - (this.agentZBuffer[z][a].img.width/2) + this.offsetX,
+                        pos.y - (this.agentZBuffer[z][a].img.height) + this.offsetY);
+                } // for a
+            } // if
+        } // for z
         this.ctx.restore();
     } // drawScene()
 
@@ -414,28 +446,26 @@ Perry.Client.WebDisplay = class {
             this.dY = - this.dY;
         } // if
         var pos = this.ij2xy(this.camera.position.i, this.camera.position.j);
-        // this.offsetX = this.width / 2 - pos.x;
-        // this.offsetY = this.height / 2 - pos.y;
-        // console.log(this.offsetY - (this.height / 2 - pos.y));
         this.offsetX = (this.width / 2 - pos.x);
         this.offsetY = (this.height / 2 - pos.y);
 
         // Draw the scene
         if (this.scene) {
-            this.drawScene(this.scene);
-            if (this.scene.agents) {
-                for (var x=0; x<this.scene.agents.length; x++) {
-                    if (typeof agents[x].img === "object") {
-                        var pos = this.ij2xy(
-                            agents[x].position.i,
-                            agents[x].position.j);
-                        this.ctx.drawImage(
-                            agents[x].img,
-                            pos.x - (agents[x].img.width/2) + this.offsetX,
-                            pos.y - (agents[x].img.height) + this.offsetY);
-                    } // if
-                } // for i
+            // First, we need to bin the agents according to z-depth.
+            // z = i + j, and represents closeness to the camera.
+            // Since 0,0 is the furthest tile, bigger z is closer.
+            // TODO: The agentZBuffer array should be maintained somewhere else and updated as needed.
+            this.agentZBuffer = [];
+            for (var a=0; a<this.scene.agents.length; a++) {
+                var z = this.scene.agents[a].position.z;
+                if (this.agentZBuffer[z]) {
+                    this.agentZBuffer[z].push(this.scene.agents[a]);
+                } // if
+                else {
+                    this.agentZBuffer[z] = [ this.scene.agents[a] ];
+                } // else
             } // if
+            this.drawScene(this.scene, this.agentZBuffer);
         } // if
 
         if (this.debug) {
@@ -452,10 +482,6 @@ Perry.Client.WebDisplay = class {
             msg = "i: " + Math.floor(this.tileI) + " j: " + Math.floor(this.tileJ);
             this.ctx.fillText(msg, 10, 42);
             // draw bounds
-            // msg = "iLo: " + this.iLo + " iHi: " + this.iHi;
-            // this.ctx.fillText(msg, 200, 14);
-            // msg = "jLo: " + this.jLo + " jHi: " + this.jHi;
-            // this.ctx.fillText(msg, 200, 28);
             msg = "zLo: " + this.zLo + " zHi: " + this.zHi;
             this.ctx.fillText(msg, 200, 14);
             // draw tile stats

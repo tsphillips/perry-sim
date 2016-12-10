@@ -26,6 +26,9 @@ if (typeof Perry === "undefined") {
         random() {
             return Math.random();
         } // random()
+        clamp(val, min, max) {
+            return Math.max(min, Math.min(max, val));
+        } // clamp()
 
         // UI Helpers
         showElement(id) {

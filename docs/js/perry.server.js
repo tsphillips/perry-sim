@@ -26,6 +26,9 @@ if (typeof Perry === "undefined") {
         random() {
             return Math.random();
         } // random()
+        clamp(val, min, max) {
+            return Math.max(min, Math.min(max, val));
+        } // clamp()
 
         // UI Helpers
         showElement(id) {
@@ -329,8 +332,7 @@ Perry.Server.Body = class extends Perry.Server.Entity {
         this.position.j += this.velocity.dj * delta;
         this.lastUpdate = t;
         this.position.z =
-            Math.floor(this.position.i) +
-            Math.floor(this.position.j);
+            Math.ceil(this.position.i) + Math.ceil(this.position.j);
         return this.position;
     } // move()
 
@@ -365,8 +367,7 @@ Perry.Server.Body = class extends Perry.Server.Entity {
             this.lastUpdate = Date.now();
         } // else
         this.position.z =
-            Math.floor(this.position.i) +
-            Math.floor(this.position.j);
+            Math.ceil(this.position.i) + Math.ceil(this.position.j);
         return this.position;
     } // moveTo()
 
