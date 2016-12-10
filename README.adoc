@@ -20,7 +20,7 @@ Some clients may be simple and straightforward, while others may be elaborate ph
 
 === No external dependencies.
 
-Why? Because other libraries are perpetual moving targets.
+Why? Because other libraries are perpetually moving targets.
 I do not want to constantly chase changes in other libraries.
 I think the eternal evolution of dependencies is a bad habit the Internet needs to kick.
 
