@@ -329,10 +329,10 @@ Perry.Client.WebDisplay = class {
         for (var z = this.zLo; z < this.zHi; z++) {
             this.dz = z - (this.camera.position.i + this.camera.position.j);
             this.qLo = - Math.floor(this.width / this.scene.tileWidth) - 3;
-            this.qHi = Math.floor(this.width / this.scene.tileWidth) + 3;
+            this.qHi = Math.ceil(this.width / this.scene.tileWidth) + 3;
             for (var q=this.qLo; q < this.qHi; q++) {
                 this.tileCnt++;
-                var i = Math.floor(this.camera.position.i + this.dz + q);
+                var i = Math.ceil(this.camera.position.i + this.dz + q);
                 var j = Math.floor(z - i);
                 if ((i < 0) ||
                     (i >= this.scene.width) ||
