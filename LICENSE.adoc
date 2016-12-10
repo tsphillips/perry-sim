@@ -9,8 +9,10 @@ Any file not bearing a mark referring to an applicable license and is not specif
 
 ## Credits
 
-* File: iso-64x64-outside.png
-* Author: Yar
-* Link: http://opengameart.org/content/isometric-64x64-outside-tileset
+```
+File: iso-64x64-outside.png
+Author: Yar
+Link: http://opengameart.org/content/isometric-64x64-outside-tileset
+```
 
 If I have included something you created, but forgot to mention you, please let me know and I will add attribution.
