@@ -35,6 +35,7 @@ Why the name "Perry Sim?"::
 
 What is the project logo?::
     The project logo is a platypus named Perry, paying homage to Perry the Platypus (AKA "Agent P"), who was a semi-aquatic egg-laying mammal of action.
+    Perry was a major character in the Phineas and Ferb cartoon series.
 
 Why is the project in Javascript?::
     Perry Sim is meant to be a self-contained platform that can run as easily as possible on as many platforms as possible.
