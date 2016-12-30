@@ -23,12 +23,14 @@ SERVER_FILES="\
     src/server/Entity.js \
     src/server/Body.js \
     src/server/Agent.js \
-    src/server/Scene.js"
+    src/server/Scene.js \
+    src/server/SceneMapGenerator.js"
 
 CLIENT_FILES="\
     src/Perry.js \
     src/client/ImageCache.js \
     src/client/TileSet.js \
+    src/client/TileSetGenerator.js \
     src/client/WebDisplay.js"
 
 

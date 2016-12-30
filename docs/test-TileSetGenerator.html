@@ -1,0 +1,39 @@
+<html>
+<head>
+    <title>Perry Sim Test Page</title>
+    <link href="https://fonts.googleapis.com/css?family=Artifika" rel="stylesheet">
+    <style>
+    body {
+        background: #000000;
+        color: #ffffff;
+    }
+    canvas {
+        padding: 0;
+        margin: auto;
+        display: block;
+        x-position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border: none;
+    }
+    </style>
+</head>
+<body>
+    <h1>
+        <img src="img/perry.png">
+        Test for TileSetGenerator
+    </h1>
+    <canvas id="perry-tileset">
+        Your browser does not appear to support the
+        <code>&lt;canvas&gt;</code> element.
+    </canvas>
+    <!-- Load the scripts here. -->
+    <script src="js/perry.server.js"></script>
+    <script src="js/perry.client.js"></script>
+    <script>
+    var tsg = new Perry.Client.TileSetGenerator(16, 16, 64, 128);
+    </script>
+</body>
+</html>

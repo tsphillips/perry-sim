@@ -43,10 +43,11 @@ Why is the project in Javascript?::
 
 What is Perry Sim best suited for?::
     Perry Sim is best suited for interactive fiction and role-playing games.
-    The project is not meant to be a general purpose game framework.
+    In particular, applications that benefit from an isometric view of the world.
+    The project is _not_ meant to be a general purpose game framework.
 
 Does the platform support multi-player games?::
-    Yes, that is a long-term goal. For now, the main focus is on self-contained packages, to include games, simulations, educational works, and interactive fiction.
+    Yes, that is a long-term goal. For now, the main focus is on self-contained packages, to include games, simulations, educational applications, and interactive fiction.
 
 Who made Perry Sim?::
     Thomas S. Phillips is the author and maintainer of Perry Sim. He likes exhaustingly long walks, cats and other predators, guns and ammo, explosives and other dangerous things, mathematics, linguistics, music, and tacos.

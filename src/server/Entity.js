@@ -18,7 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Perry;
 
 /**
-* Something that exists.
+Something that exists.
+Anything that should persist should extend Entity.
+This class needs:
+- UUID
+- auto-serializable / deserializable
+- auto-compressible
+- auto-sync between client and server (is this truth or a shadow?)
+- know where it is in the world (zone/scene)
 */
 Perry.Server.Entity = class {
     constructor(json) {

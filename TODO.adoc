@@ -2,12 +2,12 @@
 
 ## Near-term
 
-* Add button class that binds to arbitrary functions.
-* Add blocking tiles. Probably something like even numbers are pass-through and odd numbers are blocking.
-* Add target queue on Body. moveTo() will grab the next target in the queue after arriving at a target.
-* Add pathfinding to moveTo().
-* Add Zone class that references multiple Scene instances.
-* Add portal locations to scenes, where a portal links to a zone:scene:position.
+* [Client] Add button class that binds to arbitrary functions.
+* [Server] Add blocking tiles. Scene needs list of tile numbers that are passable, tile numbers that are blocking. May want to extend this to map tile numbers to functions.
+* [Server] Add target queue on Body. moveTo() will grab the next target in the queue after arriving at a target.
+* [Server] Add pathfinding to moveTo().
+* [Server] Add Zone class that references multiple Scene instances.
+* [Server] Add portal locations to scenes, where a portal links to a zone:scene:position.
 
 ## Long-term
 
