@@ -34,14 +34,19 @@ Perry.Server.Entity = class {
         } // if
         else {
             this.lastUpdate = Date.now();
+            // TODO: rewrite this UUID snippet; it is too arcane
             // uuid snippet from:
             // http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript#2117523
             this.uuid =
-            'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
-                function(c) {
-                    var r = Perry.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-                    return v.toString(16);
-                });
+                'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+                    function(c) {
+                        var r = Perry.random() * 16 | 0,
+                            v = c == 'x' ? r : (r&0x3|0x8);
+                        return v.toString(16);
+                    });
+            this.seed = 0;
+            this.type = "void";
+            // Consider entities containing entities
             this.attr = {};
         } // else
     } // constructor()
