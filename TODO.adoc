@@ -9,6 +9,10 @@
 * [Server] Add Zone class that references multiple Scene instances.
 * [Server] Add portal locations to scenes, where a portal links to a zone:scene:position.
 
+## Mid-term
+* [Server] Procedurally generated maps, characters, objects, and stories.
+* [Server] Combat system. See here: https://www.reddit.com/r/AskHistorians/comments/157upf/what_was_sword_fighting_actually_like_did_it/
+
 ## Long-term
 
 * Add EntityProxy class that is used by the Client classes. EntityProxy instances will sync with server.

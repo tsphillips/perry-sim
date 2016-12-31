@@ -19,19 +19,24 @@ DATE=`date +%Y%m%d%H%M%S`
 
 SERVER_FILES="\
     src/Perry.js \
+    src/Math.js \
     src/server/EventEngine.js \
     src/server/Entity.js \
     src/server/Body.js \
     src/server/Agent.js \
     src/server/Scene.js \
-    src/server/SceneMapGenerator.js"
+    src/server/SceneMapGenerator.js \
+    src/server/StoryArcGenerator.js \
+    "
 
 CLIENT_FILES="\
     src/Perry.js \
+    src/Math.js \
     src/client/ImageCache.js \
     src/client/TileSet.js \
     src/client/TileSetGenerator.js \
-    src/client/WebDisplay.js"
+    src/client/WebDisplay.js \
+    "
 
 
 echo ${SERVER_FILES} | xargs cat > build/perry.server.js

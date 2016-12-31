@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 if (typeof Perry === "undefined") {
     Perry = new class {
         constructor() {
+            this.Math = {};
             this.Client = {};
             this.Server = {};
         } // constructor()
@@ -131,6 +132,90 @@ if (typeof Perry === "undefined") {
 
     } // class Perry
 } // if Perry undefined
+/*
+Copyright (c)2016 Thomas S. Phillips.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+Perry;
+
+Perry.Math = {
+    min: 64000,
+    max: 64000,
+
+    /**
+    Four-state XOR Shift PRNG by George Marsaglia.
+    All values assumed to be 32-bit.
+    Pass a 4-element array as seed, if desired.
+    Returns a pseudo-random 32-bit number.
+    Adapted from https://en.wikipedia.org/wiki/Xorshift#Example_implementation.
+    Warning: This function is not thread-safe.
+    */
+    xorShift128: function(seed) {
+        // Javascript is supposed to treat integers as 32-bit,
+        // but just in case we will modulo everything 2^32.
+        var Math = Perry.Math || {};
+        if (seed) {
+            Math._xorShiftState = seed;
+        } // if seed
+        else if (typeof Math._xorShiftState === "undefined") {
+            Math._xorShiftState = [1, 2, 3, 4];
+        } // if state undefined
+        var t = Math._xorShiftState[3];
+    	t ^= (t << 11) % 0x100000000;
+    	t ^= (t >>> 8)  % 0x100000000; // logical shift
+    	Math._xorShiftState[3] = Math._xorShiftState[2];
+        Math._xorShiftState[2] = Math._xorShiftState[1];
+        Math._xorShiftState[1] = Math._xorShiftState[0];
+    	t ^= Math._xorShiftState[0];
+    	t ^= (Math._xorShiftState[0] >>> 19) % 0x100000000; // logical shift
+    	Math._xorShiftState[0] = t;
+        if (t < Math.min) { Math.min = t; }
+        if (t > Math.max) { Math.max = t; }
+    	return t;
+    } // xorShift128()
+    ,
+    random: function() {
+        var x;
+        x = Math.abs(Perry.Math.xorShift128()) / 0x80000000;
+        return x;
+    } // random()
+    ,
+    checkRnd: function() {
+        var dist = [0, 0, 0, 0];
+        var n = 64000000;
+        for (var i=0; i<n; i++) {
+            var x = Perry.Math.random();
+            if (x <= 0.25) {
+                dist[0]++;
+            } else if (x <= 0.50) {
+                dist[1]++;
+            } else if (x <= 0.75) {
+                dist[2]++;
+            } else {
+                dist[3]++;
+            } // else
+        } // for i
+        var result = [];
+        result[0] = dist[0] / n;
+        result[1] = dist[1] / n;
+        result[2] = dist[2] / n;
+        result[3] = dist[3] / n;
+        return result;
+    } // checkRnd()
+} // structure Math
 /*
 Copyright (c)2016 Thomas S. Phillips.
 
@@ -270,6 +355,7 @@ Perry;
 
 /*
 Generate a sample TileSet image.
+The TileSet image can be used as-is, or used as a template for custom images.
 */
 
 Perry.Client.TileSetGenerator = class {
@@ -298,10 +384,12 @@ Perry.Client.TileSetGenerator = class {
 
         // 16 rows, 16 columns, 256 tiles total
         // Rows 0-7 are passable, 8-15 are blocking
-        // 0-3: Outdoor, passable
-        // 4-7: Indoor, passable
-        // 8-11: Outdoor, blocking
-        // 12-15: Indoor, blocking
+        // 0-1: outdoor, passable ground
+        // 2-3: outdoor, passable ground cover
+        // 4-5: indoor, passable floor
+        // 6-7: indoor, passable floor cover
+        // 8-11: outdoor, blocking
+        // 12-15: indoor, blocking
 
         // Outdoor, passable, ground
         // red dirt: 127 82 23
@@ -338,12 +426,33 @@ Perry.Client.TileSetGenerator = class {
             for (var i=0; i<width; i++) {
                 var x = i * tileWidth;
                 var y = j * tileHeight;
-                this.drawFloor(x, y, "white", "black");
+                this.drawFloor(x, y, "rgb(255,255,255,0)", "green");
+                if (i < 8) {
+                    this.drawFLWallLow(x, y, "rgb(255,255,255,0)", "green");
+                    this.drawFRWallLow(x, y, "rgb(255,255,255,0)", "green");
+                    this.drawCeilingLow(x, y, "rgb(255,255,255,0)", "green");
+                }
+                else if (i < 12) {
+                    this.drawFLWallMid(x, y, "rgb(255,255,255,0)", "green");
+                    this.drawFRWallMid(x, y, "rgb(255,255,255,0)", "green");
+                    this.drawCeilingMid(x, y, "rgb(255,255,255,0)", "green");
+                }
+                else {
+                    if (j & 1 === 1) {
+                        this.drawBLWallHigh(x, y, "rgb(255,255,255,0)", "green");
+                    } // if
+                    else {
+                        this.drawBRWallHigh(x, y, "rgb(255,255,255,0)", "green");
+                    } // else
+                } // else
+
                 var msg = "GCVR-" + i + "-" + j;
-                this.ctx.fillStyle = "black";
+                this.ctx.save();
+                this.ctx.fillStyle = "green";
                 this.ctx.fillText(msg,
                     x + (tileWidth/2),
                     y + (tileHeight*7/8) + 4);
+                this.ctx.restore();
             } // for i
         } // for j
 
@@ -383,41 +492,56 @@ Perry.Client.TileSetGenerator = class {
             for (var i=0; i<width; i++) {
                 var x = i * tileWidth;
                 var y = j * tileHeight;
-                this.drawFloor(x, y, "white", "black");
+                this.drawFloor(x, y, "rgb(255,255,255,0)", "burlywood");
+                if (i < 8) {
+                    this.drawFLWallLow(x, y, "rgb(255,255,255,0)", "burlywood");
+                    this.drawFRWallLow(x, y, "rgb(255,255,255,0)", "burlywood");
+                    this.drawCeilingLow(x, y, "rgb(255,255,255,0)", "burlywood");
+                }
+                else if (i < 12) {
+                    this.drawFLWallMid(x, y, "rgb(255,255,255,0)", "burlywood");
+                    this.drawFRWallMid(x, y, "rgb(255,255,255,0)", "burlywood");
+                    this.drawCeilingMid(x, y, "rgb(255,255,255,0)", "burlywood");
+                }
+                else {
+                    if (j & 1 === 1) {
+                        this.drawBLWallHigh(x, y, "rgb(255,255,255,0)", "burlywood");
+                    } // if
+                    else {
+                        this.drawBRWallHigh(x, y, "rgb(255,255,255,0)", "burlywood");
+                    } // else
+                } // else
                 var msg = "FCVR-" + i + "-" + j;
-                this.ctx.fillStyle = "black";
+                this.ctx.save();
+                this.ctx.fillStyle = "burlywood";
                 this.ctx.fillText(msg,
                     x + (tileWidth/2),
                     y + (tileHeight*7/8) + 4);
+                this.ctx.restore();
             } // for i
         } // for j
 
-        // indoor, blocking
+        // outdoor, blocking
         for (var j=8; j<=11; j++) {
             for (var i=0; i<width; i++) {
                 var x = i * tileWidth;
                 var y = j * tileHeight;
                 this.drawFloor(x, y, "red", "black");
-                switch (j) {
-                    case 9: {
-                        this.drawFLWallLow(x, y, "red", "black");
-                        this.drawFRWallLow(x, y, "red", "black");
-                        this.drawCeilingLow(x, y, "red", "black");
-                        break;
-                    }
-                    case 10: {
-                        this.drawFLWallMid(x, y, "red", "black");
-                        this.drawFRWallMid(x, y, "red", "black");
-                        this.drawCeilingMid(x, y, "red", "black");
-                        break;
-                    }
-                    case 11: {
-                        this.drawFLWallHigh(x, y, "red", "black");
-                        this.drawFRWallHigh(x, y, "red", "black");
-                        this.drawCeilingHigh(x, y, "red", "black");
-                        break;
-                    }
-                } // switch
+                if (j>=9 && i<8) {
+                    this.drawFLWallLow(x, y, "gray", "black");
+                    this.drawFRWallLow(x, y, "gray", "black");
+                    this.drawCeilingLow(x, y, "gray", "black");
+                } // if
+                else if (j>=9 && i<12) {
+                    this.drawFLWallMid(x, y, "gray", "black");
+                    this.drawFRWallMid(x, y, "gray", "black");
+                    this.drawCeilingMid(x, y, "gray", "black");
+                } // if
+                else if (j>=9) {
+                    this.drawFLWallHigh(x, y, "gray", "black");
+                    this.drawFRWallHigh(x, y, "gray", "black");
+                    this.drawCeilingHigh(x, y, "gray", "black");
+                } // else
                 var msg = "GBLK-" + i + "-" + j;
                 this.ctx.fillStyle = "black";
                 this.ctx.fillText(msg,
@@ -426,32 +550,27 @@ Perry.Client.TileSetGenerator = class {
             } // for i
         } // for j
 
-        // outdoor, blocking
+        // indoor, blocking
         for (var j=12; j<=15; j++) {
             for (var i=0; i<width; i++) {
                 var x = i * tileWidth;
                 var y = j * tileHeight;
                 this.drawFloor(x, y, "red", "black");
-                switch (j) {
-                    case 13: {
-                        this.drawFLWallLow(x, y, "red", "black");
-                        this.drawFRWallLow(x, y, "red", "black");
-                        this.drawCeilingLow(x, y, "red", "black");
-                        break;
-                    }
-                    case 14: {
-                        this.drawFLWallMid(x, y, "red", "black");
-                        this.drawFRWallMid(x, y, "red", "black");
-                        this.drawCeilingMid(x, y, "red", "black");
-                        break;
-                    }
-                    case 15: {
-                        this.drawFLWallHigh(x, y, "red", "black");
-                        this.drawFRWallHigh(x, y, "red", "black");
-                        this.drawCeilingHigh(x, y, "red", "black");
-                        break;
-                    }
-                } // switch
+                if (j>=13 && i<8) {
+                    this.drawFLWallLow(x, y, "burlywood", "black");
+                    this.drawFRWallLow(x, y, "burlywood", "black");
+                    this.drawCeilingLow(x, y, "burlywood", "black");
+                } // if
+                else if (j>=13 && i<12) {
+                    this.drawFLWallMid(x, y, "burlywood", "black");
+                    this.drawFRWallMid(x, y, "burlywood", "black");
+                    this.drawCeilingMid(x, y, "burlywood", "black");
+                } // if
+                else if (j>=13) {
+                    this.drawFLWallHigh(x, y, "burlywood", "black");
+                    this.drawFRWallHigh(x, y, "burlywood", "black");
+                    this.drawCeilingHigh(x, y, "burlywood", "black");
+                } // else
                 var msg = "FBLK-" + i + "-" + j;
                 this.ctx.fillStyle = "black";
                 this.ctx.fillText(msg,
@@ -510,6 +629,7 @@ Perry.Client.TileSetGenerator = class {
 
     drawFloor(x, y, fill, stroke) {
         var p = this.getPoints(x, y);
+        this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(p.a1[0], p.a1[1]);
         this.ctx.lineTo(p.b1[0], p.b1[1]);
@@ -520,11 +640,13 @@ Perry.Client.TileSetGenerator = class {
         this.ctx.strokeStyle = stroke || "black";
         this.ctx.fill();
         this.ctx.stroke();
+        this.ctx.restore();
     } // drawFloor()
 
     // Front Left Wall Low
     drawFLWallLow(x, y, fill, stroke) {
         var p = this.getPoints(x, y);
+        this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(p.a1[0], p.a1[1]);
         this.ctx.lineTo(p.b1[0], p.b1[1]);
@@ -535,11 +657,13 @@ Perry.Client.TileSetGenerator = class {
         this.ctx.strokeStyle = stroke || "black";
         this.ctx.fill();
         this.ctx.stroke();
+        this.ctx.restore();
     } // drawFLWallLow()
 
     // Front Left Wall Mid
     drawFLWallMid(x, y, fill, stroke) {
         var p = this.getPoints(x, y);
+        this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(p.a1[0], p.a1[1]);
         this.ctx.lineTo(p.b1[0], p.b1[1]);
@@ -550,11 +674,13 @@ Perry.Client.TileSetGenerator = class {
         this.ctx.strokeStyle = stroke || "black";
         this.ctx.fill();
         this.ctx.stroke();
+        this.ctx.restore();
     } // drawFLWallMid()
 
     // Front Left Wall High
     drawFLWallHigh(x, y, fill, stroke) {
         var p = this.getPoints(x, y);
+        this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(p.a1[0], p.a1[1]);
         this.ctx.lineTo(p.b1[0], p.b1[1]);
@@ -565,11 +691,31 @@ Perry.Client.TileSetGenerator = class {
         this.ctx.strokeStyle = stroke || "black";
         this.ctx.fill();
         this.ctx.stroke();
+        this.ctx.restore();
     } // drawFLWallHigh()
+
+    // Back Left Wall High
+    drawBLWallHigh(x, y, fill, stroke) {
+        var p = this.getPoints(x, y);
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo(p.b1[0], p.b1[1]);
+        this.ctx.lineTo(p.b4[0], p.b4[1]);
+        this.ctx.lineTo(p.c4[0], p.c4[1]);
+        this.ctx.lineTo(p.c1[0], p.c1[1]);
+        this.ctx.lineTo(p.b1[0], p.b1[1]);
+        this.ctx.fillStyle = fill || "white";
+        this.ctx.strokeStyle = stroke || "black";
+        this.ctx.fill();
+        this.ctx.stroke();
+        this.ctx.restore();
+    } // drawBLWallHigh()
+
 
     // Front Right Wall Low
     drawFRWallLow(x, y, fill, stroke) {
         var p = this.getPoints(x, y);
+        this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(p.a1[0], p.a1[1]);
         this.ctx.lineTo(p.d1[0], p.d1[1]);
@@ -580,11 +726,13 @@ Perry.Client.TileSetGenerator = class {
         this.ctx.strokeStyle = stroke || "black";
         this.ctx.fill();
         this.ctx.stroke();
+        this.ctx.restore();
     } // drawFLWallLow()
 
     // Front Right Wall Mid
     drawFRWallMid(x, y, fill, stroke) {
         var p = this.getPoints(x, y);
+        this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(p.a1[0], p.a1[1]);
         this.ctx.lineTo(p.d1[0], p.d1[1]);
@@ -595,11 +743,13 @@ Perry.Client.TileSetGenerator = class {
         this.ctx.strokeStyle = stroke || "black";
         this.ctx.fill();
         this.ctx.stroke();
+        this.ctx.restore();
     } // drawFLWallMid()
 
     // Front Right Wall High
     drawFRWallHigh(x, y, fill, stroke) {
         var p = this.getPoints(x, y);
+        this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(p.a1[0], p.a1[1]);
         this.ctx.lineTo(p.d1[0], p.d1[1]);
@@ -610,10 +760,29 @@ Perry.Client.TileSetGenerator = class {
         this.ctx.strokeStyle = stroke || "black";
         this.ctx.fill();
         this.ctx.stroke();
+        this.ctx.restore();
     } // drawFLWallHigh()
+
+    // Back Right Wall High
+    drawBRWallHigh(x, y, fill, stroke) {
+        var p = this.getPoints(x, y);
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo(p.c1[0], p.c1[1]);
+        this.ctx.lineTo(p.c4[0], p.c4[1]);
+        this.ctx.lineTo(p.d4[0], p.d4[1]);
+        this.ctx.lineTo(p.d1[0], p.d1[1]);
+        this.ctx.lineTo(p.c1[0], p.c1[1]);
+        this.ctx.fillStyle = fill || "white";
+        this.ctx.strokeStyle = stroke || "black";
+        this.ctx.fill();
+        this.ctx.stroke();
+        this.ctx.restore();
+    } // drawBLWallHigh()
 
     drawCeilingLow(x, y, fill, stroke) {
         var p = this.getPoints(x, y);
+        this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(p.a2[0], p.a2[1]);
         this.ctx.lineTo(p.b2[0], p.b2[1]);
@@ -624,10 +793,12 @@ Perry.Client.TileSetGenerator = class {
         this.ctx.strokeStyle = stroke || "black";
         this.ctx.fill();
         this.ctx.stroke();
+        this.ctx.restore();
     } // drawCeilingLow()
 
     drawCeilingMid(x, y, fill, stroke) {
         var p = this.getPoints(x, y);
+        this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(p.a3[0], p.a3[1]);
         this.ctx.lineTo(p.b3[0], p.b3[1]);
@@ -638,10 +809,12 @@ Perry.Client.TileSetGenerator = class {
         this.ctx.strokeStyle = stroke || "black";
         this.ctx.fill();
         this.ctx.stroke();
+        this.ctx.restore();
     } // drawCeilingMid()
 
     drawCeilingHigh(x, y, fill, stroke) {
         var p = this.getPoints(x, y);
+        this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(p.a4[0], p.a4[1]);
         this.ctx.lineTo(p.b4[0], p.b4[1]);
@@ -652,6 +825,7 @@ Perry.Client.TileSetGenerator = class {
         this.ctx.strokeStyle = stroke || "black";
         this.ctx.fill();
         this.ctx.stroke();
+        this.ctx.restore();
     } // drawCeilingHigh()
 
 } // class TileSetGenerator
