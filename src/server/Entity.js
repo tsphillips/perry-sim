@@ -28,28 +28,41 @@ This class needs:
 - know where it is in the world (zone/scene)
 */
 Perry.Server.Entity = class {
-    constructor(json) {
-        if (typeof json === "string") {
-            Object.assign(this, JSON.parse(json));
-        } // if
-        else {
-            this.lastUpdate = Date.now();
-            // TODO: rewrite this UUID snippet; it is too arcane
-            // uuid snippet from:
-            // http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript#2117523
-            this.uuid =
-                'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
-                    function(c) {
-                        var r = Perry.random() * 16 | 0,
-                            v = c == 'x' ? r : (r&0x3|0x8);
-                        return v.toString(16);
-                    });
-            this.seed = 0;
-            this.type = "void";
-            // Consider entities containing entities
-            this.attr = {};
-        } // else
+    constructor(type, seed, uuid) {
+        this.lastUpdate = Date.now();
+
+        this.type = type || "Void";
+        if (seed) {
+            this.seed = seed;
+            Perry.Math.Seed(seed);
+        } else {
+            this.seed = Perry.Math.seed();
+        } // if-else
+        if (uuid) {
+            this.uuid = uuid;
+        } else {
+            this.uuid = this.generateUuid();
+        } // if-else
+
+        this.sim = Perry.Sim;
+        this.zone = null;
+        this.scene = null;
+
+        // Consider entities containing entities
+        this.attr = {};
+        // Entities are connected to each other.
+        // A connection is a pair: [UUID, SEED]
+        this.connections = [];
+        // Entities can contain entities.
+        // A contained entity is a pair: [UUID, SEED]
+        this.contents = [];
+
+        // Procedural generation
+        // At this point, use Perry.Server.Generator to generate content.
     } // constructor()
+
+    ///////////////////////////////////////////////////////
+    // Serialization Methods
 
     toJson() {
         return JSON.stringify(this);
@@ -59,4 +72,69 @@ Perry.Server.Entity = class {
         Object.assign(this, JSON.parse(json));
         return this;
     } // load()
+
+    ///////////////////////////////////////////////////////
+    // Generation Methods
+
+    // Generate a UUID
+    // TODO: rewrite this UUID snippet; it is too arcane
+    // uuid snippet from:
+    // http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript#2117523
+    generateUuid() {
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+            function(c) {
+                var r = Perry.Math.random() * 16 | 0,
+                    v =
+                        (c == 'x') ?
+                            r :
+                            (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        return uuid;
+    } // uuid()
+
+    // Reset the PRNG.
+    reset() {
+        Perry.Math.xorShift128Seed(this.seed);
+    } // reset()
+
+    addConnection(type) {
+        var uuid = this.generateUuid();
+        var seed = Perry.Math.seed();
+        var tuple = [ type || this.type, seed, uuid ];
+        this.connections.push(tuple);
+        return tuple;
+    } // addConnection()
+
+    addContent(type) {
+        var uuid = this.generateUuid();
+        var seed = Perry.Math.seed();
+        var tuple = [ type || "Void", seed, uuid ];
+        this.contents.push(tuple);
+        return tuple;
+    } // addContent()
+
+    /////////////////////////////////////////////////////////////////
+    // Debugging
+    print() {
+        console.log("ENTITY: " + this.type + " [" + this.seed + "] " + this.uuid);
+        console.log("  LAST UPDATE: " + this.lastUpdate);
+        console.log("  CONNECTIONS");
+        for (var i=0; i<this.connections.length; i++) {
+            console.log("    " +
+                this.connections[i][0] +
+                " [" + this.connections[i][1] + "] " +
+                this.connections[i][2]
+            );
+        } // for i
+        console.log("  CONTENTS");
+        for (var i=0; i<this.contents.length; i++) {
+            console.log("    " +
+                this.contents[i][0] +
+                " [" + this.contents[i][1] + "] " +
+                this.contents[i][2]
+            );
+        } // for i
+    } // print()
+
 } // class Entity

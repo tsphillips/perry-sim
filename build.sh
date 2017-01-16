@@ -25,6 +25,7 @@ SERVER_FILES="\
     src/server/Body.js \
     src/server/Agent.js \
     src/server/Scene.js \
+    src/server/Generator.js \
     src/server/SceneMapGenerator.js \
     src/server/StoryArcGenerator.js \
     "

@@ -19,6 +19,7 @@ if (typeof Perry === "undefined") {
     Perry = new class {
         constructor() {
             this.Math = {};
+            this.Sim = {};
             this.Client = {};
             this.Server = {};
         } // constructor()

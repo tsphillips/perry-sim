@@ -6,13 +6,25 @@ Thomas S. Phillips <tom@tsphillips.net>
 
 == Perry Sim Manifesto
 
-=== Create a virtual world simulator focusing on semantics.
+=== A virtual world simulator focusing on semantics.
 
 Simulate the relationships amongst entities, agents, and the world.
-The world consists of rules, entities are dynamic, and agents are entities with agency.
+The world consists of rules, dynamic entities, and agents that are entities with agency.
 Agents may be autonomous or controlled by real people.
 
-=== Separate the server and clients.
+=== The world is infinite.
+
+The scope of the simulation is infinite and can run standalone in a web browser.
+Although the code is separated between client and server, both can run in a single web browser.
+A world of infinite scope can be generated from a single seed.
+A seed consists of four 32-bit signed integers ([0,0,0,0] excluded), which means there are 2^128 - 1 possible infinite worlds.
+
+A world is a combination of an initial seed and a generator.
+A generator is a set of functions that procedurally generate content based on an initial seed.
+Changes to the world are limited to the storage capacity of the server.
+Changes can include insertions, deletions, and modifications.
+
+=== Client and server are separable.
 
 The server hosts a model of the world, while a client is merely a view into that model.
 Different clients can then provide different views into the same model.
@@ -20,9 +32,26 @@ Some clients may be simple and straightforward, while others may be elaborate ph
 
 === No external dependencies.
 
-Why? Because other libraries are perpetually moving targets.
+Why?
+Because other libraries are perpetually moving targets.
 I do not want to constantly chase changes in other libraries.
 I think the eternal evolution of dependencies is a bad habit the Internet needs to kick.
+
+== Definitions
+
+Sim::
+    The simulation, referenced by the Perry.Sim variable.
+Entity::
+    A thing in the world with its own state.
+    Each entity references the Sim.
+Zone::
+    A collection of semantically-related scenes.
+Scene::
+    A semantic locale that contains agents.
+    Also contains a 2-dimensional space.
+Agent::
+    An entity that interacts with the world on its own volition.
+
 
 == Q&A
 

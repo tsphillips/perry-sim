@@ -151,53 +151,77 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Perry;
 
-Perry.Math = {
-    min: 64000,
-    max: 64000,
+Perry.Math = new class {
+    constructor() {
+        this._xorShiftState = [1, 2, 3, 4];
+        this._xorShift128Min = 64000;
+        this._xorShift128Max = 64000;
+    } // constructor
 
     /**
     Four-state XOR Shift PRNG by George Marsaglia.
     All values assumed to be 32-bit.
     Pass a 4-element array as seed, if desired.
     Returns a pseudo-random 32-bit number.
-    Adapted from https://en.wikipedia.org/wiki/Xorshift#Example_implementation.
+    Adapted from:
+    https://en.wikipedia.org/wiki/Xorshift#Example_implementation
     Warning: This function is not thread-safe.
     */
-    xorShift128: function(seed) {
+    xorShift128Seed(seed) {
+        if (typeof seed === "undefined") {
+            return Perry.Math._xorShiftState.slice();
+        } // if
+        if (seed.length !== 4) {
+            throw ("Perry.Math.xorShift128Seed(): Illegal seed " + seed);
+        } // if
+        Perry.Math._xorShiftState = seed.slice();
+    } // xorShift128Seed()
+
+    xorShift128(seed) {
         // Javascript is supposed to treat integers as 32-bit,
         // but just in case we will modulo everything 2^32.
-        var Math = Perry.Math || {};
         if (seed) {
-            Math._xorShiftState = seed;
+            this.xorShift128Seed(seed);
         } // if seed
-        else if (typeof Math._xorShiftState === "undefined") {
-            Math._xorShiftState = [1, 2, 3, 4];
+        else if (typeof this._xorShiftState === "undefined") {
+            this.xorShift128Seed([1, 2, 3, 4]);
         } // if state undefined
-        var t = Math._xorShiftState[3];
+        var t = this._xorShiftState[3];
     	t ^= (t << 11) % 0x100000000;
     	t ^= (t >>> 8)  % 0x100000000; // logical shift
-    	Math._xorShiftState[3] = Math._xorShiftState[2];
-        Math._xorShiftState[2] = Math._xorShiftState[1];
-        Math._xorShiftState[1] = Math._xorShiftState[0];
-    	t ^= Math._xorShiftState[0];
-    	t ^= (Math._xorShiftState[0] >>> 19) % 0x100000000; // logical shift
-    	Math._xorShiftState[0] = t;
-        if (t < Math.min) { Math.min = t; }
-        if (t > Math.max) { Math.max = t; }
+    	this._xorShiftState[3] = this._xorShiftState[2];
+        this._xorShiftState[2] = this._xorShiftState[1];
+        this._xorShiftState[1] = this._xorShiftState[0];
+    	t ^= this._xorShiftState[0];
+    	t ^= (this._xorShiftState[0] >>> 19) % 0x100000000; // logical shift
+    	this._xorShiftState[0] = t;
+        if (t < this._xorShift128Min) { this._xorShift128Min = t; }
+        if (t > this._xorShift128Max) { this._xorShift128Max = t; }
     	return t;
     } // xorShift128()
-    ,
-    random: function() {
+
+    /**
+    Common PRND functions.
+    */
+    seed(seed) {
+        return Perry.Math.xorShift128Seed(seed);
+    } // seed()
+
+    random() {
         var x;
-        x = Math.abs(Perry.Math.xorShift128()) / 0x80000000;
+        x = Math.abs(this.xorShift128()) / 0x80000000;
         return x;
     } // random()
-    ,
-    checkRnd: function() {
+
+    /**
+    Functions for testing PRNG.
+    */
+    checkRnd() {
+        console.log("Checking PRNG. Please be patient...");
         var dist = [0, 0, 0, 0];
         var n = 64000000;
         for (var i=0; i<n; i++) {
-            var x = Perry.Math.random();
+            var x = this.random();
             if (x <= 0.25) {
                 dist[0]++;
             } else if (x <= 0.50) {
@@ -213,9 +237,9 @@ Perry.Math = {
         result[1] = dist[1] / n;
         result[2] = dist[2] / n;
         result[3] = dist[3] / n;
-        return result;
+        console.log(result);
     } // checkRnd()
-} // structure Math
+} // class instance Math
 /*
 Copyright (c)2016 Thomas S. Phillips.
 
@@ -364,28 +388,37 @@ This class needs:
 - know where it is in the world (zone/scene)
 */
 Perry.Server.Entity = class {
-    constructor(json) {
-        if (typeof json === "string") {
-            Object.assign(this, JSON.parse(json));
-        } // if
-        else {
-            this.lastUpdate = Date.now();
-            // TODO: rewrite this UUID snippet; it is too arcane
-            // uuid snippet from:
-            // http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript#2117523
-            this.uuid =
-                'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
-                    function(c) {
-                        var r = Perry.random() * 16 | 0,
-                            v = c == 'x' ? r : (r&0x3|0x8);
-                        return v.toString(16);
-                    });
-            this.seed = 0;
-            this.type = "void";
-            // Consider entities containing entities
-            this.attr = {};
-        } // else
+    constructor(type, seed, uuid) {
+        this.lastUpdate = Date.now();
+
+        this.type = type || "Void";
+        if (seed) {
+            this.seed = seed;
+            Perry.Math.Seed(seed);
+        } else {
+            this.seed = Perry.Math.seed();
+        } // if-else
+        if (uuid) {
+            this.uuid = uuid;
+        } else {
+            this.uuid = this.generateUuid();
+        } // if-else
+
+        // Consider entities containing entities
+        this.attr = {};
+        // Entities are connected to each other.
+        // A connection is a pair: [UUID, SEED]
+        this.connections = [];
+        // Entities can contain entities.
+        // A contained entity is a pair: [UUID, SEED]
+        this.contents = [];
+
+        // Procedural generation
+        // At this point, use Perry.Server.Generator to generate content.
     } // constructor()
+
+    ///////////////////////////////////////////////////////
+    // Serialization Methods
 
     toJson() {
         return JSON.stringify(this);
@@ -395,6 +428,71 @@ Perry.Server.Entity = class {
         Object.assign(this, JSON.parse(json));
         return this;
     } // load()
+
+    ///////////////////////////////////////////////////////
+    // Generation Methods
+
+    // Generate a UUID
+    // TODO: rewrite this UUID snippet; it is too arcane
+    // uuid snippet from:
+    // http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript#2117523
+    generateUuid() {
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+            function(c) {
+                var r = Perry.Math.random() * 16 | 0,
+                    v =
+                        (c == 'x') ?
+                            r :
+                            (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        return uuid;
+    } // uuid()
+
+    // Reset the PRNG.
+    reset() {
+        Perry.Math.xorShift128Seed(this.seed);
+    } // reset()
+
+    addConnection(type) {
+        var uuid = this.generateUuid();
+        var seed = Perry.Math.seed();
+        var tuple = [ type || this.type, seed, uuid ];
+        this.connections.push(tuple);
+        return tuple;
+    } // addConnection()
+
+    addContent(type) {
+        var uuid = this.generateUuid();
+        var seed = Perry.Math.seed();
+        var tuple = [ type || "Void", seed, uuid ];
+        this.contents.push(tuple);
+        return tuple;
+    } // addContent()
+
+    /////////////////////////////////////////////////////////////////
+    // Debugging
+    print() {
+        console.log("ENTITY: " + this.type + " [" + this.seed + "] " + this.uuid);
+        console.log("  LAST UPDATE: " + this.lastUpdate);
+        console.log("  CONNECTIONS");
+        for (var i=0; i<this.connections.length; i++) {
+            console.log("    " +
+                this.connections[i][0] +
+                " [" + this.connections[i][1] + "] " +
+                this.connections[i][2]
+            );
+        } // for i
+        console.log("  CONTENTS");
+        for (var i=0; i<this.contents.length; i++) {
+            console.log("    " +
+                this.contents[i][0] +
+                " [" + this.contents[i][1] + "] " +
+                this.contents[i][2]
+            );
+        } // for i
+    } // print()
+
 } // class Entity
 /*
 Copyright (c)2016 Thomas S. Phillips.
@@ -625,6 +723,30 @@ Perry.Server.Scene = class {
     } // fill()
 
 } // class Scene
+/*
+Copyright (c)2017 Thomas S. Phillips.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+Perry;
+
+/**
+Content generator.
+*/
+Perry.Server.Generator = new class {
+} // class instance Generator
 /*
 Copyright (c)2016 Thomas S. Phillips.
 
