@@ -1,6 +1,25 @@
-# TODO
+= TODO
 
-## Near-term
+== Hi-Pri
+
+* Refactor build process to use webpack and babel.
+* Refine and clarify project goals:
+    ** deterministic scene graph
+    ** procedural generation for scene graph
+    ** isometric engine
+    ** procedural generation for isometric map
+    ** agent system
+        *** navigate scene graph
+        *** navigate isometric map
+        *** interact with other agents
+    ** dialog system (subsumed by agent interaction?)
+    ** mod system for scene graph generation
+    ** mod system for isometric graph generation
+    ** mod system for agent behavior
+    ** quest system
+    ** procedural generation of quests
+
+== Near-term
 
 * [Client] Add button class that binds to arbitrary functions.
 * [Server] Add blocking tiles. Scene needs list of tile numbers that are passable, tile numbers that are blocking. May want to extend this to map tile numbers to functions.
@@ -9,10 +28,11 @@
 * [Server] Add Zone class that references multiple Scene instances.
 * [Server] Add portal locations to scenes, where a portal links to a zone:scene:position.
 
-## Mid-term
+== Mid-term
 * [Server] Procedurally generated maps, characters, objects, and stories.
 * [Server] Combat system. See here: https://www.reddit.com/r/AskHistorians/comments/157upf/what_was_sword_fighting_actually_like_did_it/
 
-## Long-term
+== Long-term
 
 * Add EntityProxy class that is used by the Client classes. EntityProxy instances will sync with server.
+

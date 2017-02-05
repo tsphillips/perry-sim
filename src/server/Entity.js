@@ -33,8 +33,12 @@ Perry.Server.Entity = class {
 
         this.type = type || "Void";
         if (seed) {
-            this.seed = seed;
-            Perry.Math.Seed(seed);
+            if (typeof seed === "string") {
+                this.seed = Perry.Math.glyph2Int(seed);
+            } else {
+                this.seed = seed;
+            } // if-else
+            Perry.Math.seed(seed);
         } else {
             this.seed = Perry.Math.seed();
         } // if-else
@@ -44,7 +48,7 @@ Perry.Server.Entity = class {
             this.uuid = this.generateUuid();
         } // if-else
 
-        this.sim = Perry.Sim;
+        this.sim = null;
         this.zone = null;
         this.scene = null;
 
@@ -68,10 +72,18 @@ Perry.Server.Entity = class {
         return JSON.stringify(this);
     } // toJson()
 
-    load(json) {
+    fromJson(json) {
         Object.assign(this, JSON.parse(json));
         return this;
-    } // load()
+    } // fromJson()
+
+    toString() {
+        return Perry.Math.lzw_encode(this.toJson());
+    } // toString()
+
+    fromString(s) {
+        return this.fromJson(Perry.Math.lzw_decode(s));
+    } // fromString()
 
     ///////////////////////////////////////////////////////
     // Generation Methods
@@ -117,21 +129,24 @@ Perry.Server.Entity = class {
     /////////////////////////////////////////////////////////////////
     // Debugging
     print() {
-        console.log("ENTITY: " + this.type + " [" + this.seed + "] " + this.uuid);
-        console.log("  LAST UPDATE: " + this.lastUpdate);
-        console.log("  CONNECTIONS");
+        console.log("ENTITY:");
+        console.log("   |TYPE: " + this.type);
+        console.log("   |SEED: " + Perry.Math.int2Glyph(this.seed));
+        console.log("   |UUID: " + this.uuid);
+        console.log("   |LAST UPDATE: " + new Date(this.lastUpdate));
+        console.log("   +CONNECTIONS");
         for (var i=0; i<this.connections.length; i++) {
-            console.log("    " +
+            console.log("       |" +
                 this.connections[i][0] +
-                " [" + this.connections[i][1] + "] " +
+                " " + Perry.Math.int2Glyph(this.connections[i][1]) + " " +
                 this.connections[i][2]
             );
         } // for i
-        console.log("  CONTENTS");
+        console.log("   +CONTENTS");
         for (var i=0; i<this.contents.length; i++) {
-            console.log("    " +
+            console.log("       |" +
                 this.contents[i][0] +
-                " [" + this.contents[i][1] + "] " +
+                " " + Perry.Math.int2Glyph(this.contents[i][1]) + " " +
                 this.contents[i][2]
             );
         } // for i

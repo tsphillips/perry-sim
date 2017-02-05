@@ -20,6 +20,7 @@ DATE=`date +%Y%m%d%H%M%S`
 SERVER_FILES="\
     src/Perry.js \
     src/Math.js \
+    src/Sim.js \
     src/server/EventEngine.js \
     src/server/Entity.js \
     src/server/Body.js \

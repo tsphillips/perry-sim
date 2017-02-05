@@ -28,3 +28,6 @@ zone.addContent("Scene");
 zone.addContent("Scene");
 zone.addContent("Scene");
 zone.addContent("Scene");
+
+var q1 = Perry.Math.int2Glyph([-1, 0, 1, 1000]);
+var q2 = Perry.Math.glyph2Int(q1);
