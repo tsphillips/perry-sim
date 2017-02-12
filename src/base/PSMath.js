@@ -15,9 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-Perry;
-
-Perry.Math = Perry.Math || new class {
+export var PSMath = new class {
     constructor() {
         this._xorShiftState = [1, 2, 3, 4];
         this._xorShift128Min = 64000;
@@ -35,12 +33,12 @@ Perry.Math = Perry.Math || new class {
     */
     xorShift128Seed(seed) {
         if (typeof seed === "undefined") {
-            return Perry.Math._xorShiftState.slice();
+            return this._xorShiftState.slice();
         } // if
         if (seed.length !== 4) {
-            throw ("Perry.Math.xorShift128Seed(): Illegal seed " + seed);
+            throw ("PSMath.xorShift128Seed(): Illegal seed " + seed);
         } // if
-        Perry.Math._xorShiftState = seed.slice();
+        this._xorShiftState = seed.slice();
     } // xorShift128Seed()
 
     xorShift128(seed) {
@@ -70,7 +68,7 @@ Perry.Math = Perry.Math || new class {
     Common PRND functions.
     */
     seed(seed) {
-        return Perry.Math.xorShift128Seed(seed);
+        return this.xorShift128Seed(seed);
     } // seed()
 
     /**
@@ -260,4 +258,8 @@ Perry.Math = Perry.Math || new class {
         return out.join("");
     } // lzw_decode()
 
-} // class instance Math
+    clamp(val, min, max) {
+        return Math.max(min, Math.min(max, val));
+    } // clamp()
+
+}; // class instance Math

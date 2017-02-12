@@ -1,0 +1,69 @@
+<html>
+<head>
+    <title>Perry Sim Blog</title>
+    <style>
+    body {
+        font-family: sans-serif;
+    }
+    h2 {
+        margin-top: 0;
+        background: black;
+        color: white;
+    }
+    div.post {
+        border: solid 1px black;
+    }
+    dt {
+        font-weight: bold;
+    }
+    </style>
+</head>
+<body>
+    <h1>Perry Sim Blog</h1>
+
+    <div class="post">
+        <h2>February 11, 2017: Refactoring</h2>
+        <p>
+            Refactoring like this:
+        </p>
+        <dl>
+            <dt>Zone Graph</dt>
+            <dd>
+                The world is partitioned into zones.
+            </dd>
+            <dt>Scene Graph</dt>
+            <dd>
+                Each zone is partitioned in scenes.
+            </dd>
+            <dt>Map</dt>
+            <dd>
+                Each scene may contain a spatial map.
+            </dd>
+            <dt>Agent System</dt>
+            <dd>
+                Things that exist in the world and interact with each other.
+            </dd>
+            <dt>Dialog System</dt>
+            <dd>
+                Agents communicate with one another using dialog.
+            </dd>
+            <dt>Commerce System</dt>
+            <dd>
+                Agents exchange items using commerce.
+            </dd>
+            <dt>Combat System</dt>
+            <dd>
+                Agents can fight each other.
+            </dd>
+            <dt>Client</dt>
+            <dd>
+                Method to view the world using an web browser.
+            </dd>
+            <dt>Math</dt>
+            <dd>
+                A math module.
+            </dd>
+        </dl>
+    </div>
+</body>
+</html>

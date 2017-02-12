@@ -1,5 +1,27 @@
 = TODO
 
+* Consider http://mochajs.org/
+
+Rethinking the backend.
+May divide into:
+
+* zone graph
+* scene graph
+* 2D map
+* dialog system
+* commerce system
+* combat system
+* agent system
+
+Then the above systems can be combined for a world simulation.
+
+For development: npm, babel, and webpack.
+
+```
+npm install babel babel-core babel-loader babel-preset-es2015 babel-preset-react webpack lite-server --save-dev
+```
+
+
 == Hi-Pri
 
 * Refactor build process to use webpack and babel.
@@ -35,4 +57,3 @@
 == Long-term
 
 * Add EntityProxy class that is used by the Client classes. EntityProxy instances will sync with server.
-

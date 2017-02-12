@@ -1,0 +1,13 @@
+{
+    "name" : "Prototype Structures",
+
+    "room01" : {
+        "map" : [
+            "xxxxx",
+            "x   x",
+            "x   x",
+            "x   x",
+            "xxdxx"
+        ]
+    }
+}

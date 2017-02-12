@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-Perry;
+import { PSMath } from './PSMath.js';
 
 /**
 Something that exists.
@@ -27,20 +27,20 @@ This class needs:
 - auto-sync between client and server (is this truth or a shadow?)
 - know where it is in the world (zone/scene)
 */
-Perry.Server.Entity = class {
+export class Entity {
     constructor(type, seed, uuid) {
         this.lastUpdate = Date.now();
 
         this.type = type || "Void";
         if (seed) {
             if (typeof seed === "string") {
-                this.seed = Perry.Math.glyph2Int(seed);
+                this.seed = PSMath.glyph2Int(seed);
             } else {
                 this.seed = seed;
             } // if-else
-            Perry.Math.seed(seed);
+            PSMath.seed(seed);
         } else {
-            this.seed = Perry.Math.seed();
+            this.seed = PSMath.seed();
         } // if-else
         if (uuid) {
             this.uuid = uuid;
@@ -78,11 +78,11 @@ Perry.Server.Entity = class {
     } // fromJson()
 
     toString() {
-        return Perry.Math.lzw_encode(this.toJson());
+        return PSMath.lzw_encode(this.toJson());
     } // toString()
 
     fromString(s) {
-        return this.fromJson(Perry.Math.lzw_decode(s));
+        return this.fromJson(PSMath.lzw_decode(s));
     } // fromString()
 
     ///////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ Perry.Server.Entity = class {
     generateUuid() {
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
             function(c) {
-                var r = Perry.Math.random() * 16 | 0,
+                var r = PSMath.random() * 16 | 0,
                     v =
                         (c == 'x') ?
                             r :
@@ -107,12 +107,12 @@ Perry.Server.Entity = class {
 
     // Reset the PRNG.
     reset() {
-        Perry.Math.xorShift128Seed(this.seed);
+        PSMath.xorShift128Seed(this.seed);
     } // reset()
 
     addConnection(type) {
         var uuid = this.generateUuid();
-        var seed = Perry.Math.seed();
+        var seed = PSMath.seed();
         var tuple = [ type || this.type, seed, uuid ];
         this.connections.push(tuple);
         return tuple;
@@ -120,7 +120,7 @@ Perry.Server.Entity = class {
 
     addContent(type) {
         var uuid = this.generateUuid();
-        var seed = Perry.Math.seed();
+        var seed = PSMath.seed();
         var tuple = [ type || "Void", seed, uuid ];
         this.contents.push(tuple);
         return tuple;
@@ -131,14 +131,14 @@ Perry.Server.Entity = class {
     print() {
         console.log("ENTITY:");
         console.log("   |TYPE: " + this.type);
-        console.log("   |SEED: " + Perry.Math.int2Glyph(this.seed));
+        console.log("   |SEED: " + PSMath.int2Glyph(this.seed));
         console.log("   |UUID: " + this.uuid);
         console.log("   |LAST UPDATE: " + new Date(this.lastUpdate));
         console.log("   +CONNECTIONS");
         for (var i=0; i<this.connections.length; i++) {
             console.log("       |" +
                 this.connections[i][0] +
-                " " + Perry.Math.int2Glyph(this.connections[i][1]) + " " +
+                " " + PSMath.int2Glyph(this.connections[i][1]) + " " +
                 this.connections[i][2]
             );
         } // for i
@@ -146,7 +146,7 @@ Perry.Server.Entity = class {
         for (var i=0; i<this.contents.length; i++) {
             console.log("       |" +
                 this.contents[i][0] +
-                " " + Perry.Math.int2Glyph(this.contents[i][1]) + " " +
+                " " + PSMath.int2Glyph(this.contents[i][1]) + " " +
                 this.contents[i][2]
             );
         } // for i
