@@ -12,6 +12,7 @@
     }
     div.post {
         border: solid 1px black;
+        margin-bottom: 1rem;
     }
     dt {
         font-weight: bold;
@@ -20,6 +21,24 @@
 </head>
 <body>
     <h1>Perry Sim Blog</h1>
+
+    <div class="post">
+        <h2>March 24, 2017: Reboot</h2>
+        <p>
+            I am reworking the internal structure and trying to make the whole package immediately useful / interesting.
+        </p>
+    </div>
+
+    <div class="post">
+        <h2>February 12, 2017: Lazy Evaluation and Observation</h2>
+        <p>
+            There are two parts to the world.
+            The first part is the structure, or scaffolding.
+            The structure is recorded in the tuples <b>connections</b> and <b>contents</b>.
+            Each tuple has a type, seed, and UUID, which collectively can be used to instantiate and initialize or load an object.
+            The challenge is to instantiate these objects only when they are observed.
+        </p>
+    </div>
 
     <div class="post">
         <h2>February 11, 2017: Refactoring</h2>
@@ -57,9 +76,9 @@
             </dd>
             <dt>Client</dt>
             <dd>
-                Method to view the world using an web browser.
+                Method to view the world using a web browser.
             </dd>
-            <dt>Math</dt>
+            <dt>PSMath</dt>
             <dd>
                 A math module.
             </dd>

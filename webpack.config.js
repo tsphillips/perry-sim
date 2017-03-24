@@ -23,7 +23,7 @@ if (env === 'build') {
 var config = {
     entry: SRC_DIR + '/main.js',
     output: {
-        path: __dirname + '/docs',
+        path: __dirname + '/docs/js',
         filename: outputFile,
         library: libraryName,
         libraryTarget: 'umd',

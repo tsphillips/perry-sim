@@ -1,8 +1,12 @@
 = README
-Thomas S. Phillips <tom@tsphillips.net>
+:author: Thomas S. Phillips
 :toc:
 :toclevels: 2
 :numbered:
+
+Too many projects; brain scrambled.
+Reboot.
+This package is being redesigned.
 
 == Perry Sim Manifesto
 
@@ -38,6 +42,10 @@ I do not want to constantly chase changes in other libraries.
 I think the eternal evolution of dependencies is a bad habit the Internet needs to kick.
 
 == Definitions
+
+Entity::
+    A thing in the world with its own state.
+    Each entity references the Sim.
 
 Sim::
     The simulation, referenced by the Perry.Sim variable.

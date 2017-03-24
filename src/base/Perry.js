@@ -16,16 +16,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Entity } from './Entity';
+import { World } from './World';
 import { Zone } from '../zone/Zone';
 
 export var Perry = new class {
     constructor() {
         this.type = 'Perry';
-        this.zone = new Zone();
+        this.name = 'Perry Sim, virtual world simulator.';
+        this.objects = {};
     } // constructor()
 
-    createEntity() {
-        return new Entity();
-    } // createEntity()
+    init() {
+        this.world = this.create('World');
+        this.world.init();
+    }
+
+    create(type) {
+        var obj = undefined;
+        switch(type) {
+            case 'Entity': {
+                obj = new Entity();
+                break;
+            }
+            case 'World': {
+                obj = new World();
+                break;
+            }
+            case 'Zone': {
+                obj = new Zone();
+                break;
+            }
+        } // switch
+        if (typeof obj === 'undefined') {
+            return undefined;
+        } // if
+        obj.perry = this;
+        this.objects[obj.uuid] = obj;
+        return obj;
+    } // create()
 
 }; // class Perry

@@ -69,7 +69,13 @@ export class Entity {
     // Serialization Methods
 
     toJson() {
-        return JSON.stringify(this);
+        return JSON.stringify(this, function(key, value) {
+            if (key === 'perry') {
+                return undefined;
+            } else {
+                return value;
+            } // if-else
+        });
     } // toJson()
 
     fromJson(json) {
@@ -81,8 +87,9 @@ export class Entity {
         return PSMath.lzw_encode(this.toJson());
     } // toString()
 
-    fromString(s) {
-        return this.fromJson(PSMath.lzw_decode(s));
+    fromString(s, perry) {
+        var obj = this.fromJson(PSMath.lzw_decode(s));
+        obj.perry = perry;
     } // fromString()
 
     ///////////////////////////////////////////////////////

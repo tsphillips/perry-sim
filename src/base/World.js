@@ -1,5 +1,5 @@
 /*
-Copyright (C)2017 Thomas S. Phillips.
+Copyright (c)2017 Thomas S. Phillips.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,16 +15,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Entity } from '../base/Entity';
+import { Entity } from './Entity.js';
 
 /**
-A partition of a World.
+A virtual world.
 */
-export class Zone extends Entity {
+export class World extends Entity {
     constructor() {
         super();
-        this.type = 'Zone';
-        this.class = Zone;
-        this.name = 'Default Scene';
-    } // constructor()
-}; // class Zone
+        this.type = 'World';
+        this.class = World;
+        this.name = 'Default World';
+    }
+
+    init() {
+        this.addContent('Zone');
+    }
+} // class World
